@@ -7,6 +7,10 @@ const uint8_t pin_hijau = 9;
 const byte MATI = 0x1;
 const byte HIDUP = 0x0;
 
+const uint8_t batas_kecerahan_merah = 30;
+const uint8_t batas_kecerahan_kuning = 100;
+const uint8_t batas_kecerahan_hijau = 100;
+
 void setup(){
   pinMode(pin_merah, OUTPUT);
   pinMode(pin_kuning, OUTPUT);
@@ -14,20 +18,9 @@ void setup(){
 }
 
 void loop(){
-  digitalWrite(pin_merah, HIDUP);
-  digitalWrite(pin_kuning, MATI);
-  digitalWrite(pin_hijau, MATI);
-  delay(5000);
-  
-  digitalWrite(pin_merah, MATI);
-  digitalWrite(pin_kuning, HIDUP);
-  digitalWrite(pin_hijau, MATI);
-  delay(1000);
-  
-  digitalWrite(pin_merah, MATI);
-  digitalWrite(pin_kuning, MATI);
-  digitalWrite(pin_hijau, HIDUP);
-  delay(3000);
-
-
+  for(uint8_t kecerahan = 0; kecerahan < batas_kecerahan_merah; kecerahan++)
+  {
+    analogWrite(pin_merah, kecerahan);
+    delay(100);
+  }
 }
