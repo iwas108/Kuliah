@@ -17,17 +17,17 @@ void loop(){
   digitalWrite(pin_merah, HIDUP);
   digitalWrite(pin_kuning, MATI);
   digitalWrite(pin_hijau, MATI);
-  delay(30000);
+  delay(5000);
   
   digitalWrite(pin_merah, MATI);
   digitalWrite(pin_kuning, HIDUP);
   digitalWrite(pin_hijau, MATI);
-  delay(3000);
+  delay(1000);
   
   digitalWrite(pin_merah, MATI);
   digitalWrite(pin_kuning, MATI);
   digitalWrite(pin_hijau, HIDUP);
-  delay(15000);
+  delay(3000);
 
 
 }
