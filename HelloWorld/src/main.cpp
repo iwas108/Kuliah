@@ -1,18 +1,33 @@
 #include <Arduino.h>
 
+const uint8_t pin_merah = 11;
+const uint8_t pin_kuning = 10;
+const uint8_t pin_hijau = 9;
+
+const byte MATI = 0x1;
+const byte HIDUP = 0x0;
+
 void setup(){
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  pinMode(pin_merah, OUTPUT);
+  pinMode(pin_kuning, OUTPUT);
+  pinMode(pin_hijau, OUTPUT);
 }
 
 void loop(){
-  digitalWrite(9, HIGH);
-  digitalWrite(10, HIGH);
-  digitalWrite(11, HIGH);
-  delay(250);
-  digitalWrite(9, LOW);
-  digitalWrite(10, LOW);
-  digitalWrite(11, LOW);
-  delay(250);
+  digitalWrite(pin_merah, HIDUP);
+  digitalWrite(pin_kuning, MATI);
+  digitalWrite(pin_hijau, MATI);
+  delay(30000);
+  
+  digitalWrite(pin_merah, MATI);
+  digitalWrite(pin_kuning, HIDUP);
+  digitalWrite(pin_hijau, MATI);
+  delay(3000);
+  
+  digitalWrite(pin_merah, MATI);
+  digitalWrite(pin_kuning, MATI);
+  digitalWrite(pin_hijau, HIDUP);
+  delay(15000);
+
+
 }
