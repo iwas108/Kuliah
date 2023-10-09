@@ -23,4 +23,9 @@ void loop(){
     analogWrite(pin_merah, kecerahan);
     delay(100);
   }
+  for(uint8_t kecerahan = batas_kecerahan_merah; kecerahan > 0; kecerahan--)
+  {
+    analogWrite(pin_merah, kecerahan);
+    delay(100);
+  }
 }
