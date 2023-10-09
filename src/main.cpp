@@ -1,40 +1,59 @@
 #include <Arduino.h>
 
-const uint8_t pin_merah = 11;
-const uint8_t pin_kuning = 10;
-const uint8_t pin_hijau = 9;
+const uint8_t pin[3] = {11, 10, 9}; // merah, kuning, hijau
 
-const byte MATI = 0x1;
-const byte HIDUP = 0x0;
+const byte MATI = 0x0;
+const byte HIDUP = 0x1;
 
-const uint8_t batas_kecerahan_merah = 30;
-const uint8_t batas_kecerahan_kuning = 70;
-const uint8_t batas_kecerahan_hijau = 70;
+const uint8_t batas_kecerahan[3] = {50, 50, 50};
 
-void lampuDisco(const uint8_t pin_warna, const uint8_t batas_kecerahan);
+int16_t kecerahan[3] = {0, 0, 0};
+
+bool arah[3] = {HIDUP, HIDUP, HIDUP};
+
+unsigned long last_on[3] = {0, 0, 0};
+
+void lampuDisco();
 
 void setup(){
-  pinMode(pin_merah, OUTPUT);
-  pinMode(pin_kuning, OUTPUT);
-  pinMode(pin_hijau, OUTPUT);
+  Serial.begin(115200);
+
+  pinMode(pin[0], OUTPUT);
+  pinMode(pin[1], OUTPUT);
+  pinMode(pin[2], OUTPUT);
 }
 
 void loop(){
-  lampuDisco(pin_merah, batas_kecerahan_merah);
-  lampuDisco(pin_kuning, batas_kecerahan_kuning);
-  lampuDisco(pin_hijau, batas_kecerahan_hijau);
+  lampuDisco();
 }
 
-void lampuDisco(const uint8_t pin_warna, const uint8_t batas_kecerahan)
+void lampuDisco()
 {
-  for(int16_t kecerahan = 0; kecerahan <= batas_kecerahan; kecerahan++)
+  unsigned long now = millis();
+  
+  for(uint8_t i = 0; i < 3; i++)
   {
-    analogWrite(pin_warna, kecerahan);
-    delay(25);
-  }
-  for(int16_t kecerahan = batas_kecerahan; kecerahan >= 0; kecerahan--)
-  {
-    analogWrite(pin_warna, kecerahan);
-    delay(25);
+    if(now - last_on[i] >= 25)
+    {
+      if(arah[i] == HIDUP)
+      {
+        analogWrite(pin[i], kecerahan[i]++);
+      }
+      else if(arah[i] == MATI)
+      {
+        analogWrite(pin[i], kecerahan[i]--);
+      }
+      
+      if(kecerahan[i] >= batas_kecerahan[i])
+      {
+        arah[i] = MATI;
+      }
+      else if(kecerahan[i] <= 0)
+      {
+        arah[i] = HIDUP;
+      }
+      
+      last_on[i] = now;
+    }
   }
 }
