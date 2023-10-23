@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 const uint8_t pin[3] = {11, 10, 9}; // merah, kuning, hijau
 
@@ -13,44 +15,54 @@ bool arah[3] = {HIDUP, HIDUP, HIDUP};
 
 unsigned long last_on[3] = {0, 0, 0};
 
+OneWire oneWire(4);
+DallasTemperature SENSOR_SUHU(&oneWire);
+
 void lampuDisco();
-void bacaSuhu();
+float bacaSuhu(const char metric);
+void cetakSuhu();
 
 void setup(){
   Serial.begin(115200);
+  SENSOR_SUHU.begin();
 
   pinMode(pin[0], OUTPUT);
   pinMode(pin[1], OUTPUT);
   pinMode(pin[2], OUTPUT);
 
-  pinMode(A5, INPUT);
 }
 
 void loop(){
   //lampuDisco();
-  bacaSuhu();
+  cetakSuhu();
 }
 
-void bacaSuhu(){
-  int nilaiADC;
-  for(int i = 0; i < 100; i++){
-    nilaiADC += analogRead(A0);
+float bacaSuhu(const char metric){
+  SENSOR_SUHU.requestTemperatures(); 
+  float celcius = SENSOR_SUHU.getTempCByIndex(0);
+
+  if(metric == 'C'){
+    return celcius;
   }
-  float nilaiADCAvrg = nilaiADC / 100;
-  
-  float mV = nilaiADCAvrg * 4.88;
-  float celcius = mV / 10;
+  else{
+    return 0;
+  } 
+}
 
-  Serial.print( "ADC: " );
-  Serial.print(nilaiADC);
-  Serial.print( " - " );
-  Serial.print( "mV: " );
-  Serial.print(mV);
-  Serial.print( " - " );
-  Serial.print( "Celcius: " );
-  Serial.println(celcius);
-
-  delay(1000);
+unsigned long cetakSuhu_timer = 0;
+void cetakSuhu(){
+  unsigned long now = millis();
+  if( now - cetakSuhu_timer > 5000 ){
+    Serial.print("Celcius: ");
+    Serial.print(bacaSuhu('C'));
+    Serial.print(" - ");
+    Serial.print("Fahrenheit: ");
+    Serial.print(bacaSuhu('C'));
+    // Reamur, Kelvin
+    Serial.println();
+    
+    cetakSuhu_timer = now; //reset timer
+  }
 }
 
 void lampuDisco()
