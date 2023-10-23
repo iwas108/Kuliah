@@ -1,6 +1,4 @@
 #include <Arduino.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 
 const uint8_t pin[3] = {11, 10, 9}; // merah, kuning, hijau
 
@@ -15,20 +13,17 @@ bool arah[3] = {HIDUP, HIDUP, HIDUP};
 
 unsigned long last_on[3] = {0, 0, 0};
 
-OneWire oneWire(4);
-DallasTemperature SENSOR_SUHU(&oneWire);
-
 void lampuDisco();
 void bacaSuhu();
 
 void setup(){
   Serial.begin(115200);
-  SENSOR_SUHU.begin();
 
   pinMode(pin[0], OUTPUT);
   pinMode(pin[1], OUTPUT);
   pinMode(pin[2], OUTPUT);
 
+  pinMode(A5, INPUT);
 }
 
 void loop(){
@@ -37,9 +32,21 @@ void loop(){
 }
 
 void bacaSuhu(){
-  SENSOR_SUHU.requestTemperatures(); 
-  float celcius = SENSOR_SUHU.getTempCByIndex(0);
+  int nilaiADC;
+  for(int i = 0; i < 100; i++){
+    nilaiADC += analogRead(A0);
+  }
+  float nilaiADCAvrg = nilaiADC / 100;
+  
+  float mV = nilaiADCAvrg * 4.88;
+  float celcius = mV / 10;
 
+  Serial.print( "ADC: " );
+  Serial.print(nilaiADC);
+  Serial.print( " - " );
+  Serial.print( "mV: " );
+  Serial.print(mV);
+  Serial.print( " - " );
   Serial.print( "Celcius: " );
   Serial.println(celcius);
 
