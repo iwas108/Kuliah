@@ -1,0 +1,18 @@
+.card-header {
+    text-align: center;
+}
+
+.card-header h6 {
+    margin:0;
+    padding-bottom: 30px;
+}
+
+.card-body{
+    text-align: center;
+    margin:0;
+    padding-top: 30px;
+}
+
+.card-body h1 {
+    
+}

@@ -67,6 +67,7 @@ void loop() {
     doc["ip"] = WiFi.localIP();
     doc["ssid"] = WiFi.SSID();
     doc["temperature"] = random(17, 32);
+    doc["humidity"] = random(0, 100);
     doc["uptime"] = millis();
     //broadcast data ke semua klien
     String output;

@@ -1,74 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My ESP32 Dashboard</title>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Replace 'yourWebSocketServerURL' with the actual WebSocket server URL
-            const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
-            //const socket = new WebSocket('ws://'+'192.168.2.45'+'/ws');
-
-            // Connection opened
-            socket.addEventListener('open', (event) => {
-                console.log('Connected to the WebSocket server');
-                
-                // Sending data to the server after connection is open
-                socket.send('Hello, server!');
-            });
-
-            // Listen for messages from the server
-            socket.addEventListener('message', (event) => {
-                //console.log('Message from server:', event.data);
-                var data = JSON.parse(event.data);
-                console.log(data);
-                if(data.rssi){
-                    var element = document.getElementById('rssi');
-                    element.innerHTML = "<p>RSSI: "+data.rssi+"</p>";
-                }
-                if(data.temperature){
-                    var element = document.getElementById('temperature');
-                    element.innerHTML = "<p>Temperature: "+data.temperature+"</p>";
-                }
-                if(data.ip){
-                    var element = document.getElementById('ip');
-                    element.innerHTML = "<p>IP Address: "+data.ip+"</p>";
-                }
-                if(data.ssid){
-                    var element = document.getElementById('ssid');
-                    element.innerHTML = "<p>SSID: "+data.ssid+"</p>";
-                }
-                if(data.uptime){
-                    var element = document.getElementById('uptime');
-                    element.innerHTML = "<p>Uptime: "+data.uptime+"</p>";
-                }
-                
-            });
-
-            // Listen for any errors that occur.
-            socket.addEventListener('error', (event) => {
-                console.error('WebSocket Error:', event);
-            });
-
-            // Connection closed
-            socket.addEventListener('close', (event) => {
-                if (event.wasClean) {
-                    console.log(`Connection closed cleanly, code=${event.code}, reason=${event.reason}`);
-                } else {
-                    console.error('Connection abruptly closed');
-                }
-            });
-         });
-    </script>
+    <link rel="stylesheet" href="pico.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="main.js"></script>
 </head>
-<body style="background-color: black; color: antiquewhite;">
-    <h1>Hello world!</h1>
-    <p>This was served by ESP32 web server.</p>
-    <div id="rssi"></div>
-    <div id="ip"></div>
-    <div id="ssid"></div>
-    <div id="temperature"></div>
-    <div id="uptime"></div>
+<body>
+    <main class="container">
+        <nav>
+            <ul>
+                <li><strong>ESP32 Realtime Dashboard</strong></li>
+            </ul>
+        </nav>
+        <header>
+            <blockquote>
+                "The device IP Address is <span id="ip"></span> and currently the device is up for <span id="uptime"></span> milli seconds. The device is connected to the WiFi Network <span id="ssid"></span> with signal strength around <span id="rssi"></span>%."
+                <footer>
+                  <cite>- Powered by WebSocket</cite>
+                </footer>
+            </blockquote>
+            <hr>
+        </header>
+        <div class="grid">
+            <article>
+                <div class="card-header">
+                    <h6>🌡️ Temperature</h6>
+                </div>
+                <div class="card-body">
+                    <h1><span id="temperature"></span> °C</h1>
+                </div>
+            </article>
+            <article>
+                <div class="card-header">
+                    <h6>💧 Humidity</h6>
+                </div>
+                <div class="card-body">
+                    <h1><span id="humidity"></span> %</h1>
+                </div>
+            </article>
+        </div>
+        <footer>
+            <hr>
+            &copy; 2023 PSTI
+        </footer>
+    </main>
 </body>
 </html>
