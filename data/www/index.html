@@ -8,6 +8,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Replace 'yourWebSocketServerURL' with the actual WebSocket server URL
             const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
+            //const socket = new WebSocket('ws://'+'192.168.2.45'+'/ws');
 
             // Connection opened
             socket.addEventListener('open', (event) => {
@@ -19,9 +20,30 @@
 
             // Listen for messages from the server
             socket.addEventListener('message', (event) => {
-                console.log('Message from server:', event.data);
-                var element = document.getElementById('rssi');
-                element.innerHTML = "<p>"+event.data+"</p>";
+                //console.log('Message from server:', event.data);
+                var data = JSON.parse(event.data);
+                console.log(data);
+                if(data.rssi){
+                    var element = document.getElementById('rssi');
+                    element.innerHTML = "<p>RSSI: "+data.rssi+"</p>";
+                }
+                if(data.temperature){
+                    var element = document.getElementById('temperature');
+                    element.innerHTML = "<p>Temperature: "+data.temperature+"</p>";
+                }
+                if(data.ip){
+                    var element = document.getElementById('ip');
+                    element.innerHTML = "<p>IP Address: "+data.ip+"</p>";
+                }
+                if(data.ssid){
+                    var element = document.getElementById('ssid');
+                    element.innerHTML = "<p>SSID: "+data.ssid+"</p>";
+                }
+                if(data.uptime){
+                    var element = document.getElementById('uptime');
+                    element.innerHTML = "<p>Uptime: "+data.uptime+"</p>";
+                }
+                
             });
 
             // Listen for any errors that occur.
@@ -44,5 +66,9 @@
     <h1>Hello world!</h1>
     <p>This was served by ESP32 web server.</p>
     <div id="rssi"></div>
+    <div id="ip"></div>
+    <div id="ssid"></div>
+    <div id="temperature"></div>
+    <div id="uptime"></div>
 </body>
 </html>

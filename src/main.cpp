@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiMulti.h>
-
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
 #include "SPIFFS.h"
+#include <ArduinoJson.h>
 
 const char* ssid = "LAB TI";
 const char* pass = "#tiundiknas";
@@ -60,11 +59,20 @@ void loop() {
 
   //Eksekusi setiap 1 detik sekali
   unsigned long now = millis();
-  if( (now - SCHEDULER_WS_ROUTINE) >= 1000 ){
+  if( (now - SCHEDULER_WS_ROUTINE) >= 100 ){
 
+    //Persiapakan data yang akan dibroadcast
+    StaticJsonDocument<200> doc;
+    doc["rssi"] = min(max(2 * (WiFi.RSSI() + 100), 0), 100);
+    doc["ip"] = WiFi.localIP();
+    doc["ssid"] = WiFi.SSID();
+    doc["temperature"] = random(17, 32);
+    doc["uptime"] = millis();
     //broadcast data ke semua klien
+    String output;
+    serializeJson(doc, output);
     if(myWs.count() > 0){
-      myWs.textAll(String(min(max(2 * (WiFi.RSSI() + 100), 0), 100)).c_str());
+      myWs.textAll(output.c_str());
     }
 
     SCHEDULER_WS_ROUTINE = now;
@@ -96,8 +104,6 @@ void onWiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
-    client->printf("Hello Client %u :)", client->id());
-    client->ping();
   } else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect\n", server->url(), client->id());
   } else if(type == WS_EVT_ERROR){
@@ -124,10 +130,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       }
       Serial.printf("%s\n",msg.c_str());
 
-      if(info->opcode == WS_TEXT)
-        client->text("I got your text message");
-      else
-        client->binary("I got your binary message");
+      if(info->opcode == WS_TEXT){}
+      else{}
     } else {
       //message is comprised of multiple frames or the frame is split into multiple packets
       if(info->index == 0){
@@ -155,10 +159,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         Serial.printf("ws[%s][%u] frame[%u] end[%llu]\n", server->url(), client->id(), info->num, info->len);
         if(info->final){
           Serial.printf("ws[%s][%u] %s-message end\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
-          if(info->message_opcode == WS_TEXT)
-            client->text("I got your text message");
-          else
-            client->binary("I got your binary message");
+          if(info->message_opcode == WS_TEXT){}
+          else{}
         }
       }
     }
