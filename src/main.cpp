@@ -3,7 +3,7 @@
 #include <WiFiMulti.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #include <ArduinoJson.h>
 
 const char* ssid = "LAB TI";
@@ -25,7 +25,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  if(!SPIFFS.begin(true)){
+  if(!LittleFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
@@ -39,7 +39,7 @@ void setup() {
       request->send(200, "text/plain", "Hello, world");
   });*/
 
-  myWeb.serveStatic("/", SPIFFS, "/www/").setDefaultFile("index.html");
+  myWeb.serveStatic("/", LittleFS, "/www/").setDefaultFile("index.html");
 
   while (myWiFi.run() != WL_CONNECTED){
     Serial.print(".");
