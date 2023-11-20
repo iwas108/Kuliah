@@ -4,9 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My ESP32 Dashboard</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Replace 'yourWebSocketServerURL' with the actual WebSocket server URL
+            const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
+
+            // Connection opened
+            socket.addEventListener('open', (event) => {
+                console.log('Connected to the WebSocket server');
+                
+                // Sending data to the server after connection is open
+                socket.send('Hello, server!');
+            });
+
+            // Listen for messages from the server
+            socket.addEventListener('message', (event) => {
+                console.log('Message from server:', event.data);
+                var element = document.getElementById('rssi');
+                element.innerHTML = "<p>"+event.data+"</p>";
+            });
+
+            // Listen for any errors that occur.
+            socket.addEventListener('error', (event) => {
+                console.error('WebSocket Error:', event);
+            });
+
+            // Connection closed
+            socket.addEventListener('close', (event) => {
+                if (event.wasClean) {
+                    console.log(`Connection closed cleanly, code=${event.code}, reason=${event.reason}`);
+                } else {
+                    console.error('Connection abruptly closed');
+                }
+            });
+         });
+    </script>
 </head>
 <body style="background-color: black; color: antiquewhite;">
     <h1>Hello world!</h1>
     <p>This was served by ESP32 web server.</p>
+    <div id="rssi"></div>
 </body>
 </html>
