@@ -60,7 +60,10 @@ int myFunction(int x, int y) {
 
 void onWiFiConnected(WiFiEvent_t event, WiFiEventInfo_t info){
   Serial.print("WiFi connected: ");
-  Serial.println(WiFi.SSID());
+  Serial.print(WiFi.SSID());
+  Serial.print(" Signal: ");
+  Serial.print(min(max(2 * (WiFi.RSSI() + 100), 0), 100));
+  Serial.println("%");
 }
 
 void onWiFiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
