@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Replace 'yourWebSocketServerURL' with the actual WebSocket server URL
-    const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
-    //const socket = new WebSocket('ws://'+'192.168.2.45'+'/ws');
+    //const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
+    const socket = new WebSocket('ws://'+'192.168.2.70'+'/ws');
 
     // Connection opened
     socket.addEventListener('open', (event) => {
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.addEventListener('message', (event) => {
         //console.log('Message from server:', event.data);
         var data = JSON.parse(event.data);
-        console.log(data);
+        //console.log(data);
         if(data.rssi){
             var element = document.getElementById('rssi');
             element.innerHTML = data.rssi;
@@ -40,6 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
             var element = document.getElementById('uptime');
             element.innerHTML = data.uptime;
         }
+        if(data.switch){
+            var element = document.getElementById('switch'+data.switch);
+            if(data.state){
+                element.innerHTML = "Switch " + data.switch + " ON";
+                element.classList.remove("secondary");
+                //element.classList.add("outline");
+            }else{
+                element.innerHTML = "Switch " + data.switch + " OFF";
+                //element.classList.remove("outline");
+                element.classList.add("secondary");
+            }
+            console.log("Switch "+data.switch+" state: "+data.state);
+        }
         
     });
 
@@ -56,4 +69,23 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Connection abruptly closed');
         }
     });
+
+    document.getElementById("switch1").addEventListener("click", function() {
+        // Code to handle the click event for Switch 1
+        console.log("Switch 1 clicked");
+        socket.send('{"switch":1}');
+    });
+
+    document.getElementById("switch2").addEventListener("click", function() {
+        // Code to handle the click event for Switch 2
+        console.log("Switch 2 clicked");
+        socket.send('{"switch":2}');
+    });
+
+    document.getElementById("switch3").addEventListener("click", function() {
+        // Code to handle the click event for Switch 3
+        console.log("Switch 3 clicked");
+        socket.send('{"switch":3}');
+    });
+
  });
