@@ -22,6 +22,7 @@ void onWiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
 void setSwitch(uint8_t switchId);
 void sendData(StaticJsonDocument<512> &doc);
+void setLedBrightness(uint8_t channel, uint8_t pinLed, uint8_t brightness);
 
 uint8_t pinLed[3] = {25, 33, 32}; // hijau, biru, merah
 bool ledState[3] = {false, false, false};
@@ -61,12 +62,13 @@ void setup() {
 }
 
 unsigned long SCHEDULER_WS_ROUTINE = 0;
+unsigned long SCHEDULER_EXECUTE_ROUTINE = 0;
 void loop() {
   // put your main code here, to run repeatedly:
   myWiFi.run();
   myWs.cleanupClients();
 
-  //Eksekusi setiap 1 detik sekali
+  //Eksekusi setiap 0.1 detik sekali
   unsigned long now = millis();
   if( (now - SCHEDULER_WS_ROUTINE) >= 100 ){
 
@@ -83,9 +85,32 @@ void loop() {
 
     SCHEDULER_WS_ROUTINE = now;
   }
+
+  //Eksekusi setiap 1 detik sekali
+  now = millis();
+  if( (now - SCHEDULER_EXECUTE_ROUTINE) >= 1000 ){
+    setLedBrightness(0, pinLed[0], random(0, 100));
+    setLedBrightness(1, pinLed[1], random(0, 100));
+    setLedBrightness(2, pinLed[2], random(0, 100));
+    
+    SCHEDULER_EXECUTE_ROUTINE = now;
+  }
 }
 
 // put function definitions here:
+void setLedBrightness(uint8_t channel, uint8_t pinLed, uint8_t brightness){
+  const int freq = 5000;
+  const int resolution = 8;
+
+  // configure LED PWM functionalitites
+  ledcSetup(channel, freq, resolution);
+
+  // attach the channel to the GPIO to be controlled
+  ledcAttachPin(pinLed, channel);
+
+  ledcWrite(channel, map(brightness, 0, 100, 0, 255));
+}
+
 void sendData(StaticJsonDocument<512> &doc){
   String output;
   serializeJson(doc, output);
