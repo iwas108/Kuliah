@@ -86,10 +86,6 @@ void loop() {
 }
 
 // put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
-
 void sendData(StaticJsonDocument<512> &doc){
   String output;
   serializeJson(doc, output);
@@ -98,41 +94,32 @@ void sendData(StaticJsonDocument<512> &doc){
   }
 }
 
+void syncSwitch(uint8_t switchId){
+  StaticJsonDocument<512> doc;
+  doc["switch"] = switchId;
+  doc["state"] = ledState[switchId - 1];
+  sendData(doc);
+}
+
 void setSwitch(uint8_t switchId){
   if(switchId == 1){
     ledState[0] = !ledState[0];
     digitalWrite(pinLed[0], ledState[0]);
-
-    StaticJsonDocument<512> doc;
-    doc["switch"] = switchId;
-    doc["state"] = ledState[switchId - 1];
-    sendData(doc);
-
+    syncSwitch(1);
     Serial.printf("Switch %d is %s\n", switchId, ledState[switchId - 1] ? "ON" : "OFF");
   }
   else if(switchId == 2){
     ledState[1] = !ledState[1];
     digitalWrite(pinLed[1], ledState[1]);
-
-    StaticJsonDocument<512> doc;
-    doc["switch"] = switchId;
-    doc["state"] = ledState[switchId - 1];
-    sendData(doc);
-
+    syncSwitch(2);
     Serial.printf("Switch %d is %s\n", switchId, ledState[switchId - 1] ? "ON" : "OFF");
   }
   else if(switchId == 3){
     ledState[2] = !ledState[2];
     digitalWrite(pinLed[2], ledState[2]);
-
-    StaticJsonDocument<512> doc;
-    doc["switch"] = switchId;
-    doc["state"] = ledState[switchId - 1];
-    sendData(doc);
-
+    syncSwitch(3);
     Serial.printf("Switch %d is %s\n", switchId, ledState[switchId - 1] ? "ON" : "OFF");
   }
-
 }
 
 void onWiFiConnected(WiFiEvent_t event, WiFiEventInfo_t info){
@@ -155,6 +142,9 @@ void onWiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
+    syncSwitch(1);
+    syncSwitch(2);
+    syncSwitch(3);
   } 
   else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect\n", server->url(), client->id());
