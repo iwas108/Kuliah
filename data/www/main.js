@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             console.log("Switch "+data.switch+" state: "+data.state);
         }
+        if(data.slider){
+            var element = document.getElementById('slider'+data.slider);
+            element.value = data.brightness;
+            console.log("Slider "+data.slider+" brightness: "+data.brightness);
+        }
         
     });
 
@@ -86,6 +91,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Code to handle the click event for Switch 3
         console.log("Switch 3 clicked");
         socket.send('{"switch":3}');
+    });
+
+    document.getElementById("slider1").addEventListener("change", function() {
+        // Code to handle the change event for Slider 1
+        console.log("Slider 1 changed");
+        socket.send('{"slider":1,"brightness":'+this.value+'}');
+    });
+
+    document.getElementById("slider2").addEventListener("change", function() {
+        // Code to handle the change event for Slider 2
+        console.log("Slider 2 changed");
+        socket.send('{"slider":2,"brightness":'+this.value+'}');
+    });
+
+    document.getElementById("slider3").addEventListener("change", function() {
+        // Code to handle the change event for Slider 3
+        console.log("Slider 3 changed");
+        socket.send('{"slider":3,"brightness":'+this.value+'}');
     });
 
  });

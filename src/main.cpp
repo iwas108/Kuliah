@@ -23,9 +23,11 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 void setSwitch(uint8_t switchId);
 void sendData(StaticJsonDocument<512> &doc);
 void setLedBrightness(uint8_t channel, uint8_t pinLed, uint8_t brightness);
+void syncSlider(uint8_t sliderId);
 
 uint8_t pinLed[3] = {25, 33, 32}; // hijau, biru, merah
 bool ledState[3] = {false, false, false};
+uint8_t ledBrightness[3] = {0, 0, 0};
 
 void setup() {
   // put your setup code here, to run once:
@@ -89,9 +91,9 @@ void loop() {
   //Eksekusi setiap 1 detik sekali
   now = millis();
   if( (now - SCHEDULER_EXECUTE_ROUTINE) >= 1000 ){
-    setLedBrightness(0, pinLed[0], random(0, 100));
+    /*setLedBrightness(0, pinLed[0], random(0, 100));
     setLedBrightness(1, pinLed[1], random(0, 100));
-    setLedBrightness(2, pinLed[2], random(0, 100));
+    setLedBrightness(2, pinLed[2], random(0, 100));*/
     
     SCHEDULER_EXECUTE_ROUTINE = now;
   }
@@ -102,6 +104,8 @@ void setLedBrightness(uint8_t channel, uint8_t pinLed, uint8_t brightness){
   const int freq = 5000;
   const int resolution = 8;
 
+  ledBrightness[channel] = brightness;
+
   // configure LED PWM functionalitites
   ledcSetup(channel, freq, resolution);
 
@@ -109,6 +113,10 @@ void setLedBrightness(uint8_t channel, uint8_t pinLed, uint8_t brightness){
   ledcAttachPin(pinLed, channel);
 
   ledcWrite(channel, map(brightness, 0, 100, 0, 255));
+
+  syncSlider(channel + 1);
+
+  Serial.printf("LED %d is set to %d\n", channel, brightness);
 }
 
 void sendData(StaticJsonDocument<512> &doc){
@@ -117,12 +125,20 @@ void sendData(StaticJsonDocument<512> &doc){
   if(myWs.count() > 0){
     myWs.textAll(output.c_str());
   }
+  //Serial.printf("Data sent: %s\n", output.c_str());
 }
 
 void syncSwitch(uint8_t switchId){
   StaticJsonDocument<512> doc;
   doc["switch"] = switchId;
   doc["state"] = ledState[switchId - 1];
+  sendData(doc);
+}
+
+void syncSlider(uint8_t sliderId){
+  StaticJsonDocument<512> doc;
+  doc["slider"] = sliderId;
+  doc["brightness"] = ledBrightness[sliderId - 1];
   sendData(doc);
 }
 
@@ -170,6 +186,10 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     syncSwitch(1);
     syncSwitch(2);
     syncSwitch(3);
+
+    syncSlider(1);
+    syncSlider(2);
+    syncSlider(3);
   } 
   else if(type == WS_EVT_DISCONNECT){
     Serial.printf("ws[%s][%u] disconnect\n", server->url(), client->id());
@@ -193,6 +213,17 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         }
         else if(doc["switch"].as<int>() == 3){
           setSwitch(3);
+        }
+      }
+      if(doc["slider"] != nullptr){
+        if(doc["slider"].as<uint8_t>() == 1){
+          setLedBrightness(0, pinLed[0], doc["brightness"].as<uint8_t>());
+        }
+        else if(doc["slider"].as<uint8_t>() == 2){
+          setLedBrightness(1, pinLed[1], doc["brightness"].as<uint8_t>());
+        }
+        else if(doc["slider"].as<uint8_t>() == 3){
+          setLedBrightness(2, pinLed[2], doc["brightness"].as<uint8_t>());
         }
       }
     }
