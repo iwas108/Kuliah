@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Replace 'yourWebSocketServerURL' with the actual WebSocket server URL
-    //const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
-    const socket = new WebSocket('ws://'+'192.168.2.70'+'/ws');
+    const socket = new WebSocket('ws://'+window.location.hostname+'/ws');
+    //const socket = new WebSocket('ws://'+'192.168.2.70'+'/ws');
 
     // Connection opened
     socket.addEventListener('open', (event) => {
